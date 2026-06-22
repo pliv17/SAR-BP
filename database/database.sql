@@ -32,11 +32,12 @@ CREATE TABLE alerta (
     CONSTRAINT fk_alerta_usuario FOREIGN KEY (usuario_id) REFERENCES usuario(id)
 );
 
+-- password = "password123" hashed with BCrypt
 INSERT INTO usuario (nombres, apellidos, doc_identificacion, username, password, rol, estado) VALUES 
-('Admin', 'Central', '12345678901', 'admin_central', '$2a$10$R9h9yclERdQ9A69DZO7yOuzY4AALZ2B7hB3K2tHhWvV8D7D8d8Y2q', 'ADMIN', 'ACTIVO'),
-('Carlos David', 'García Sánchez', '67895432', 'carlos_garcia', '$2a$10$R9h9yclERdQ9A69DZO7yOuzY4AALZ2B7hB3K2tHhWvV8D7D8d8Y2q', 'LIDER', 'ACTIVO'),
-('Luisa', 'Sandoval Llanos', '69007434', 'luisa_sandoval', '$2a$10$R9h9yclERdQ9A69DZO7yOuzY4AALZ2B7hB3K2tHhWvV8D7D8d8Y2q', 'LIDER', 'ACTIVO'),
-('Esther Carolina', 'Sosa Maldonado', '14126478987', 'esther_sosa', '$2a$10$R9h9yclERdQ9A69DZO7yOuzY4AALZ2B7hB3K2tHhWvV8D7D8d8Y2q', 'LIDER', 'INACTIVO');
+('Admin', 'Central', '12345678901', 'admin_central', '$2a$12$7MWKFvhb9RHTYX7SrbnlvuFKEdJtflZsB9uAHHfzYV2GdcUnYjeiK', 'ADMIN', 'ACTIVO'),
+('Carlos David', 'García Sánchez', '67895432', 'carlos_garcia', '$2a$12$7MWKFvhb9RHTYX7SrbnlvuFKEdJtflZsB9uAHHfzYV2GdcUnYjeiK', 'LIDER', 'ACTIVO'),
+('Luisa', 'Sandoval Llanos', '69007434', 'luisa_sandoval', '$2a$12$7MWKFvhb9RHTYX7SrbnlvuFKEdJtflZsB9uAHHfzYV2GdcUnYjeiK', 'LIDER', 'ACTIVO'),
+('Esther Carolina', 'Sosa Maldonado', '14126478987', 'esther_sosa', '$2a$12$7MWKFvhb9RHTYX7SrbnlvuFKEdJtflZsB9uAHHfzYV2GdcUnYjeiK', 'LIDER', 'INACTIVO');
 
 INSERT INTO categoria (nombre, estado) VALUES 
 ('PLAGA', 'ACTIVO'),
