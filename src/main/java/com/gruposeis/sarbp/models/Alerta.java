@@ -17,8 +17,9 @@ public class Alerta {
     @Column(name = "descripcion", nullable = false, columnDefinition = "text")
     private String descripcion;
 
-    @Column(name = "categoria_id", nullable = false)
-    private Long categoriaId;
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "categoria_id", nullable = false)
+    private Categoria categoria;
 
     @Column(name = "estado", nullable = false, length = 20)
     private String estado = "ACTIVO";
@@ -26,7 +27,7 @@ public class Alerta {
     @Column(name = "fecha_creacion", nullable = false)
     private LocalDateTime fechaCreacion;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "usuario_id", nullable = false)
     private Usuario usuario;
 
@@ -61,12 +62,12 @@ public class Alerta {
         this.descripcion = descripcion;
     }
 
-    public Long getCategoriaId() {
-        return categoriaId;
+    public Categoria getCategoria() {
+        return categoria;
     }
 
-    public void setCategoriaId(Long categoriaId) {
-        this.categoriaId = categoriaId;
+    public void setCategoria(Categoria categoria) {
+        this.categoria = categoria;
     }
 
     public String getEstado() {
