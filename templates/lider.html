@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Panel Líder | SAR-BP</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <style>
+        body { background-color: #f0f4f8; }
+        .sidebar {
+            background: #0d6efd;
+            min-height: 100vh;
+            color: white;
+        }
+        .sidebar .nav-link { color: rgba(255,255,255,0.8); border-radius: 8px; }
+        .sidebar .nav-link:hover, .sidebar .nav-link.active { background: rgba(255,255,255,0.15); color: white; }
+        .card-stat { border: none; border-radius: 12px; }
+        .table th { font-size: 0.82rem; text-transform: uppercase; letter-spacing: 0.5px; color: #6c757d; }
+    </style>
+</head>
+<body>
+<div class="container-fluid p-0">
+<div class="row g-0">
+
+    <!-- ── Sidebar ── -->
+    <div class="col-auto sidebar d-flex flex-column py-4 px-3" style="width:220px; min-width:200px;">
+        <div class="text-center mb-4">
+            <i class="bi bi-broadcast-pin display-6"></i>
+            <div class="fw-bold mt-1 fs-5">SAR-BP</div>
+            <div class="small opacity-75">Líder Comunal</div>
+        </div>
+        <nav class="nav flex-column gap-1">
+            <a class="nav-link active" href="/lider">
+                <i class="bi bi-grid-fill me-2"></i>Mis Alertas
+            </a>
+            <a class="nav-link" href="/">
+                <i class="bi bi-eye me-2"></i>Ver tablón público
+            </a>
+        </nav>
+        <div class="mt-auto">
+            <div class="small opacity-75 mb-2">
+                <i class="bi bi-person-circle me-1"></i>
+                <span th:text="${lider.nombres + ' ' + lider.apellidos}">Líder</span>
+            </div>
+            <form th:action="@{/logout}" method="post">
+                <button class="btn btn-outline-light btn-sm w-100">
+                    <i class="bi bi-box-arrow-right me-1"></i> Cerrar sesión
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- ── Contenido principal ── -->
+    <div class="col p-4">
+
+        <h4 class="fw-bold mb-1">Panel del Líder Comunal</h4>
+        <p class="text-muted mb-4">Publica y gestiona las alertas de tu comunidad.</p>
+
+        <!-- Alertas flash -->
+        <div th:if="${exito}" class="alert alert-success alert-dismissible fade show" role="alert">
+            <i class="bi bi-check-circle-fill me-2"></i>
+            <span th:text="${exito}">Éxito</span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+        <div th:if="${error}" class="alert alert-danger alert-dismissible fade show" role="alert">
+            <i class="bi bi-exclamation-triangle-fill me-2"></i>
+            <span th:text="${error}">Error</span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+
+        <!-- Tarjeta stat -->
+        <div class="row g-3 mb-4">
+            <div class="col-auto">
+                <div class="card card-stat shadow-sm px-4 py-3">
+                    <div class="small text-muted">Total mis alertas</div>
+                    <div class="fs-3 fw-bold text-primary" th:text="${#lists.size(alertas)}">0</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ── Formulario nueva alerta ── -->
+        <div class="card shadow-sm mb-4">
+            <div class="card-header bg-white fw-semibold">
+                <i class="bi bi-plus-circle-fill text-primary me-2"></i>Nueva Alerta
+            </div>
+            <div class="card-body">
+                <form th:action="@{/lider/nueva}" method="post">
+                    <div class="row g-3">
+                        <div class="col-12 col-md-6">
+                            <label class="form-label">Título <span class="text-danger">*</span></label>
+                            <input type="text" name="titulo" class="form-control"
+                                   placeholder="Ej: Bloqueo en canal de regadío"
+                                   maxlength="100" required>
+                        </div>
+                        <div class="col-12 col-md-6">
+                            <label class="form-label">Categoría <span class="text-danger">*</span></label>
+                            <select name="categoriaId" class="form-select" required>
+                                <option value="" disabled selected>Selecciona una categoría</option>
+                                <option th:each="cat : ${categorias}"
+                                        th:value="${cat.id}"
+                                        th:text="${cat.nombre}">
+                                    Categoría
+                                </option>
+                            </select>
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label">Descripción <span class="text-danger">*</span></label>
+                            <textarea name="descripcion" class="form-control" rows="3"
+                                      placeholder="Describe el problema con detalle..." required></textarea>
+                        </div>
+                        <div class="col-12 text-end">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="bi bi-send-fill me-1"></i> Publicar alerta
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- ── Tabla mis alertas ── -->
+        <div class="card shadow-sm">
+            <div class="card-header bg-white fw-semibold">
+                <i class="bi bi-list-ul me-2 text-secondary"></i>Mis alertas publicadas
+            </div>
+            <div class="card-body p-0">
+
+                <!-- Sin alertas -->
+                <div th:if="${#lists.isEmpty(alertas)}" class="text-center py-5 text-muted">
+                    <i class="bi bi-inbox display-5 d-block mb-2"></i>
+                    <p>Aún no has publicado ninguna alerta.</p>
+                </div>
+
+                <!-- Tabla -->
+                <div class="table-responsive" th:unless="${#lists.isEmpty(alertas)}">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Título</th>
+                                <th>Categoría</th>
+                                <th>Estado</th>
+                                <th>Fecha</th>
+                                <th class="text-end">Acción</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="alerta : ${alertas}">
+                                <td>
+                                    <span class="fw-semibold" th:text="${alerta.titulo}">Título</span>
+                                    <div class="small text-muted text-truncate" style="max-width:250px;"
+                                         th:text="${alerta.descripcion}">Descripción</div>
+                                </td>
+                                <td>
+                                    <span class="badge"
+                                          th:classappend="${alerta.categoria.nombre == 'PLAGA'} ? 'bg-success'
+                                                       : (${alerta.categoria.nombre == 'SEGURIDAD'} ? 'bg-danger'
+                                                       : (${alerta.categoria.nombre == 'AGUA Y DESAGÜE'} ? 'bg-info text-dark'
+                                                       : 'bg-warning text-dark'))"
+                                          th:text="${alerta.categoria.nombre}">
+                                        CAT
+                                    </span>
+                                </td>
+                                <td>
+                                    <span class="badge"
+                                          th:classappend="${alerta.estado == 'ACTIVO'} ? 'bg-success' : 'bg-secondary'"
+                                          th:text="${alerta.estado}">
+                                        ACTIVO
+                                    </span>
+                                </td>
+                                <td class="small text-muted"
+                                    th:text="${#temporals.format(alerta.fechaCreacion, 'dd/MM/yyyy HH:mm')}">
+                                    fecha
+                                </td>
+                                <td class="text-end">
+                                    <!-- Botón eliminar con confirmación -->
+                                    <form th:action="@{/lider/eliminar/{id}(id=${alerta.id})}" method="post"
+                                          onsubmit="return confirm('¿Estás seguro de eliminar esta alerta?')">
+                                        <button type="submit" class="btn btn-outline-danger btn-sm">
+                                            <i class="bi bi-trash3"></i> Eliminar
+                                        </button>
+                                    </form>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+            </div>
+        </div>
+
+    </div><!-- fin col contenido -->
+</div><!-- fin row -->
+</div><!-- fin container-fluid -->
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

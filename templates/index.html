@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>SAR-BP | Alertas Vecinales</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <style>
+        body { background-color: #f8f9fa; }
+        .navbar-brand { font-weight: 700; letter-spacing: 1px; }
+        .badge-categoria {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .card-alerta {
+            border-left: 4px solid #0d6efd;
+            transition: box-shadow 0.2s;
+        }
+        .card-alerta:hover { box-shadow: 0 4px 16px rgba(0,0,0,0.10); }
+        .card-alerta.PLAGA         { border-left-color: #198754; }
+        .card-alerta.SEGURIDAD     { border-left-color: #dc3545; }
+        .card-alerta.AGUA          { border-left-color: #0dcaf0; }
+        .card-alerta.INFRAESTRUCTURA { border-left-color: #fd7e14; }
+        .hero {
+            background: linear-gradient(135deg, #0d6efd 0%, #0a58ca 100%);
+            color: white;
+            padding: 3rem 0 2.5rem;
+        }
+        .fecha-text { font-size: 0.8rem; }
+    </style>
+</head>
+<body>
+
+<!-- ── Navbar ── -->
+<nav class="navbar navbar-expand-lg navbar-dark bg-primary shadow-sm">
+    <div class="container">
+        <a class="navbar-brand" href="/">
+            <i class="bi bi-broadcast-pin me-1"></i> SAR-BP
+        </a>
+        <div class="ms-auto">
+            <a class="btn btn-outline-light btn-sm" th:href="@{/login}">
+                <i class="bi bi-box-arrow-in-right me-1"></i> Iniciar sesión
+            </a>
+        </div>
+    </div>
+</nav>
+
+<!-- ── Hero ── -->
+<div class="hero">
+    <div class="container">
+        <h1 class="fw-bold mb-1">
+            <i class="bi bi-megaphone-fill me-2"></i>Tablón de Alertas
+        </h1>
+        <p class="mb-0 opacity-75">Sistema de Alertas y Reportes Vecinales — Boletín Público</p>
+    </div>
+</div>
+
+<!-- ── Contenido principal ── -->
+<div class="container py-4">
+
+    <!-- Contador de alertas -->
+    <div class="d-flex align-items-center justify-content-between mb-3">
+        <h5 class="mb-0 text-secondary">
+            <i class="bi bi-bell-fill text-warning me-1"></i>
+            Alertas activas:
+            <span class="badge bg-primary ms-1" th:text="${#lists.size(alertas)}">0</span>
+        </h5>
+        <span class="text-muted fecha-text">
+            <i class="bi bi-clock me-1"></i>
+            Actualizado: <span th:text="${#temporals.format(#temporals.createNow(), 'dd/MM/yyyy HH:mm')}">ahora</span>
+        </span>
+    </div>
+
+    <!-- Sin alertas -->
+    <div th:if="${#lists.isEmpty(alertas)}" class="text-center py-5 text-muted">
+        <i class="bi bi-check-circle display-4 d-block mb-3 text-success"></i>
+        <h5>No hay alertas activas en este momento.</h5>
+        <p>Tu comunidad está tranquila.</p>
+    </div>
+
+    <!-- Lista de alertas -->
+    <div class="row g-3" th:unless="${#lists.isEmpty(alertas)}">
+        <div class="col-12 col-md-6 col-lg-4" th:each="alerta : ${alertas}">
+            <div class="card card-alerta h-100 shadow-sm"
+                 th:classappend="${alerta.categoria.nombre}">
+                <div class="card-body">
+
+                    <!-- Categoría + fecha -->
+                    <div class="d-flex justify-content-between align-items-start mb-2">
+                        <span class="badge badge-categoria"
+                              th:classappend="${alerta.categoria.nombre == 'PLAGA'} ? 'bg-success'
+                                           : (${alerta.categoria.nombre == 'SEGURIDAD'} ? 'bg-danger'
+                                           : (${alerta.categoria.nombre == 'AGUA Y DESAGÜE'} ? 'bg-info text-dark'
+                                           : 'bg-warning text-dark'))"
+                              th:text="${alerta.categoria.nombre}">
+                            CATEGORÍA
+                        </span>
+                        <small class="text-muted fecha-text"
+                               th:text="${#temporals.format(alerta.fechaCreacion, 'dd/MM/yy')}">
+                            fecha
+                        </small>
+                    </div>
+
+                    <!-- Título -->
+                    <h6 class="card-title fw-semibold mb-2" th:text="${alerta.titulo}">
+                        Título de la alerta
+                    </h6>
+
+                    <!-- Descripción -->
+                    <p class="card-text text-muted small mb-3" th:text="${alerta.descripcion}">
+                        Descripción de la alerta...
+                    </p>
+
+                    <!-- Líder reportante -->
+                    <div class="d-flex align-items-center mt-auto pt-2 border-top">
+                        <i class="bi bi-person-fill text-secondary me-2"></i>
+                        <small class="text-secondary">
+                            Reportado por:
+                            <strong th:text="${alerta.usuario.nombres + ' ' + alerta.usuario.apellidos}">
+                                Líder
+                            </strong>
+                        </small>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<!-- ── Footer ── -->
+<footer class="text-center text-muted py-4 mt-4 border-top">
+    <small>
+        <i class="bi bi-geo-alt me-1"></i> SAR-BP &mdash; Sistema de Alertas y Reportes Vecinales &copy; 2025
+    </small>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
